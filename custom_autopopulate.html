@@ -1,0 +1,291 @@
+
+
+<!-- // HTML -->
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+
+
+<div class="container-fluid" id="leadcontainer" style="width: 300px;">
+  <div class="row">
+    <div id="autopopulatecustom_selected_items_container">
+      <ul id="autopopulatecustom_selected_items"></ul>
+    </div>
+    <input type="text" class="autopopulatecustom" id="" onclick="autopopulatecustom('multiple', 'click', 'leadcontainer')" onkeyup="autopopulatecustom('multiple', 'change', 'leadcontainer')" style="width: 100%">
+    <div id="autopopulatecustom_dropdown" style="width: calc(100% + 6px); height: 200px; border: 1px solid #000; overflow-y: auto; overflow-x: hidden;">
+      <ul id="autopopulatecustom_dataList"></ul>
+      <div class="loading-spinner-container">
+        <img class="loading-spinner" src="https://icons.veryicon.com/png/o/miscellaneous/selling-wine-net/loading-42.png">
+      </div>
+      <ul>
+        <li>Add New</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+<div class="container-fluid" id="dealcontainer" style="width: 300px;">
+  <div class="row">
+    <div id="autopopulatecustom_selected_items_container">
+      <ul id="autopopulatecustom_selected_items"></ul>
+    </div>
+    <input type="text" class="autopopulatecustom" id="" onclick="autopopulatecustom('single', 'click', 'dealcontainer')" onkeyup="autopopulatecustom('single', 'change', 'dealcontainer')" style="width: 100%">
+    <div id="autopopulatecustom_dropdown" style="width: calc(100% + 6px); height: 200px; border: 1px solid #000; overflow: auto;">
+      <ul id="autopopulatecustom_dataList"></ul>
+      <div class="loading-spinner-container">
+        <img class="loading-spinner" src="https://icons.veryicon.com/png/o/miscellaneous/selling-wine-net/loading-42.png">
+      </div>
+      <ul>
+        <li>Add New</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<style type="text/css">
+  
+// CSS
+.data_title {
+  color: #00f;
+}
+
+
+.data_url {
+  color: #f00;
+}
+  
+  .loading-spinner img {
+    width: 100px;
+    height: 100px;
+  }
+
+
+
+/* Spinner */
+
+@-webkit-keyframes rotate-forever {
+  0% {
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@-moz-keyframes rotate-forever {
+  0% {
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@keyframes rotate-forever {
+  0% {
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+.loading-spinner {
+  -webkit-animation-duration: 0.75s;
+  -moz-animation-duration: 0.75s;
+  animation-duration: 0.75s;
+  -webkit-animation-iteration-count: infinite;
+  -moz-animation-iteration-count: infinite;
+  animation-iteration-count: infinite;
+  -webkit-animation-name: rotate-forever;
+  -moz-animation-name: rotate-forever;
+  animation-name: rotate-forever;
+  -webkit-animation-timing-function: linear;
+  -moz-animation-timing-function: linear;
+  animation-timing-function: linear;
+  height: 30px;
+  width: 30px;
+  border: 8px solid #ffffff;
+  border-right-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+
+
+.loading-spinner {
+  text-align: center;
+  margin: auto;
+  display: none;
+/*  background: red;*/
+}
+
+</style>
+
+<script type="text/javascript">
+// script
+let clickhandlerArr=[];
+let autopopulatecustom_flag_Loading=[];
+let autopopulatecustom_page=[];
+let autopopulatecustom_responsehandlerArr=[];
+let autopopulatecustom_data_object=[];
+let autopopulatecustom_item_clickhandler = (selection_type="multiple", index, container_id) => {
+  if(!clickhandlerArr[container_id])
+    clickhandlerArr[container_id] = []
+  if(!autopopulatecustom_responsehandlerArr[container_id])
+    autopopulatecustom_responsehandlerArr[container_id] = []
+  if(!clickhandlerArr[container_id].includes(index)) {
+    if(selection_type == "single") {
+      $("#"+container_id+" #autopopulatecustom_selected_items").empty();
+      if(clickhandlerArr[container_id].length > 0)
+        clickhandlerArr[container_id].pop();
+      if(clickhandlerArr[container_id].length == 0)
+        clickhandlerArr[container_id].push(index);
+      if(autopopulatecustom_responsehandlerArr[container_id].length > 0)
+        autopopulatecustom_responsehandlerArr[container_id].pop();
+      if(autopopulatecustom_responsehandlerArr[container_id].length == 0)
+        autopopulatecustom_responsehandlerArr[container_id].push( autopopulatecustom_data_object[container_id][index]['id'])
+      console.log(autopopulatecustom_responsehandlerArr)
+      $("#"+container_id+" #autopopulatecustom_list_item_"+index).css("display", "none");
+      $("#"+container_id+" #autopopulatecustom_selected_items").append('<li id="selected_autopopulatecustom_list_item_'+index+'" onclick="autopopulatecustom_item_remove('+index+', \''+container_id+'\')">'+autopopulatecustom_data_object[container_id][index]['title']+'</li>');
+    } else {
+      clickhandlerArr.push(index);
+      autopopulatecustom_responsehandlerArr[container_id].push( autopopulatecustom_data_object[container_id][index]['id'])
+      // console.log(autopopulatecustom_responsehandlerArr)
+      $("#"+container_id+" #autopopulatecustom_list_item_"+index).css("display", "none");
+      $("#"+container_id+" #autopopulatecustom_selected_items").append('<li id="selected_autopopulatecustom_list_item_'+index+'" onclick="autopopulatecustom_item_remove('+index+', \''+container_id+'\')">'+autopopulatecustom_data_object[container_id][index]['title']+'</li>');
+    }
+  }
+}
+let autopopulatecustom_item_remove = (index, container_id) => {
+  if(clickhandlerArr.includes(index)) {
+    $("#"+container_id+" #selected_autopopulatecustom_list_item_"+index).remove();
+    
+    clickhandlerArr.splice(clickhandlerArr.indexOf(index), 1)
+    autopopulatecustom_responsehandlerArr[container_id].splice(autopopulatecustom_responsehandlerArr[container_id].indexOf(autopopulatecustom_data_object[container_id][index]['id']), 1)
+    console.log(autopopulatecustom_responsehandlerArr)
+    $("#"+container_id+" #autopopulatecustom_list_item_"+index).css("display", "block");
+    // $("#autopopulatecustom_selected_items").append('<li>'+autopopulatecustom_data_object[container_id][index]['title']+'</li>')
+  }
+}
+let autopopulatecustom = (selection_type='multiple', event_type='click', container_id='autopopulatecustom_containercustom', url="https://jsonplaceholder.typicode.com/photos", method="GET",autopopulatecustom_temp_page=1, editArr = [1, 2], datacount=50) => {
+  // console.log("Test 2")
+  let autopopulatecustom_page_start_from = (autopopulatecustom_temp_page-1)*datacount;
+  let autopopulatecustom_page_end_to = autopopulatecustom_temp_page*datacount;
+    $('.loading-spinner').css('display', 'block');
+  if(!autopopulatecustom_responsehandlerArr[container_id])
+    autopopulatecustom_responsehandlerArr[container_id] = []
+  if(!autopopulatecustom_data_object[container_id])
+    autopopulatecustom_data_object[container_id] = []
+    
+  
+  let flag_test = 1;
+  if(event_type == 'scroll') {
+    flag_test = 0;
+      searchby={
+        start: autopopulatecustom_page_start_from,
+        end: autopopulatecustom_page_end_to,
+      };
+  }
+  else {
+    if(event_type == 'click') {
+      searchby={
+        start: autopopulatecustom_page_start_from,
+        end: autopopulatecustom_page_end_to,
+      };
+      $("#"+container_id+" input.autopopulatecustom").select()
+    }
+    if(event_type == 'change') {
+      searchby={
+        start: autopopulatecustom_page_start_from,
+        end: autopopulatecustom_page_end_to,
+        id: $("#"+container_id+" input.autopopulatecustom").val(),
+      };
+    }
+  }
+  if(event_type == 'change' && $("#"+container_id+" input.autopopulatecustom").val().length > 2)
+    flag_test = 0;
+  if(autopopulatecustom_data_object[container_id])
+    if(autopopulatecustom_data_object[container_id].length == 0)
+      flag_test = 0;
+  // console.log(element)
+  if(flag_test == 0) {
+    $.ajax({
+        url: url,
+        type: method,
+        data: searchby,
+        // data: {
+        //     name: "paul rudd",
+        //     movies: ["I Love You Man", "Role Models"]
+        // },
+        success: function(response){
+          autopopulatecustom_data_object[container_id] = response;
+            // console.log(response);
+          if(event_type != 'scroll') {
+            $("#"+container_id+" #autopopulatecustom_dataList").empty()
+          }
+          $.each(response, (i, rec) => {
+
+            $("#"+container_id+" #autopopulatecustom_dataList").append("<li class='listClick' id='autopopulatecustom_list_item_"+i+"' onclick=\"autopopulatecustom_item_clickhandler(\'"+selection_type+"\', "+i+", \'"+container_id+"\')\"><img src='"+rec.url+"' style='width: 30px'><span class='data_title'>"+rec.title+"</span><br /><span class='data_url'>"+rec.url+"</span></li>");
+            if(editArr.includes(rec.id)) {
+              autopopulatecustom_item_clickhandler(selection_type, i, container_id);
+            }
+          });
+          
+          $('.loading-spinner').css('display', 'none');
+
+          
+          
+          if(!autopopulatecustom_page[container_id])
+            autopopulatecustom_page[container_id] = autopopulatecustom_temp_page;
+          else
+            autopopulatecustom_page[container_id] = autopopulatecustom_temp_page;
+
+          if(!autopopulatecustom_flag_Loading[container_id])
+            autopopulatecustom_flag_Loading[container_id] = 0
+          else
+            autopopulatecustom_flag_Loading[container_id] = 0
+
+          // console.log("#"+container_id+" #autopopulatecustom_dropdown", $("#"+container_id+" #autopopulatecustom_dropdown"))
+          $("#"+container_id+" #autopopulatecustom_dropdown").scroll(function() {
+                console.log("Test")
+            console.log($(this).scrollTop(), $(this).innerHeight(), $(this)[0].scrollHeight, autopopulatecustom_flag_Loading[container_id] == 0);
+            // console.log($(this).scrollTop() + $(this).innerHeight()+10 >= $(this)[0].scrollHeight && autopopulatecustom_flag_Loading[container_id] == 0);
+              if((parseFloat($(this).scrollTop()) + parseFloat($(this).innerHeight())+10) >= $(this)[0].scrollHeight && autopopulatecustom_flag_Loading[container_id] == 0) {
+              autopopulatecustom_page[container_id]++;
+              autopopulatecustom_flag_Loading[container_id]++;
+              autopopulatecustom(selection_type, 'scroll', container_id, url, method,autopopulatecustom_page[container_id], editArr);
+              }
+          });
+  
+          // $(".listClick").css("background", "#0000aa");
+        }
+    });
+  }
+}
+
+</script>
+
+
+
